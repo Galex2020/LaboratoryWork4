@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Необходимо выполнить заданную обработку числового двумерного массива,
+// имеющего произвольное количество строк (N) и столбцов (M). N <= 7, M <= 5.
+// Элементы массива должны вводиться с клавиатуры.
+// Вычислить массив сумм отрицательных чисел в каждой строке.
+
+using System;
 using System.Text;
 using System.Threading;
 using static System.Console;
@@ -7,69 +12,78 @@ namespace LaboratoryWork4
 {
     class Program
     {
-        private static int x;
-        private static int y;
 
-        private static double ForceParse(string exMessage)
+        private static int _x;
+        private static int _y;
+
+        // Метод для парсинга string в int.
+        // До тех пор, пока вводимая строка не распарсится.
+        private static double GetForcedParse(string exceptionMessage, int exceptionMessageShowTime = 1250)
         {
             string inputString;
             double resultDouble;
 
             while (true)
             {
-                if (double.TryParse(inputString = StringLimiter(8), out resultDouble))
+                if (double.TryParse(inputString = GetLimitedString(8), out resultDouble))
                 {
                     WriteLine();
                     return resultDouble;
                 }
 
-                StringCleaner(inputString);
+                ClearString(inputString);
 
                 ForegroundColor = ConsoleColor.Red;
-                Write("\a" + exMessage);
-                Thread.Sleep(1250);
+                Write("\a" + exceptionMessage);
+                Thread.Sleep(exceptionMessageShowTime);
                 ResetColor();
 
-                StringCleaner(exMessage);
+                ClearString(exceptionMessage);
             }  
         }
 
-        private static string StringLimiter(int limit)
+        // Метод для ограничения длинны вводимой строки.
+        // Так же реализует функции клавиш: Enter и Backspace.
+        private static string GetLimitedString(int limitOfChars)
         {
-            var resultSB = new StringBuilder(limit);
+            var resultStringBuilder = new StringBuilder(limitOfChars);
 
-            while (resultSB.Length < limit)
+            while (resultStringBuilder.Length < limitOfChars)
             {
-                var keyPress = ReadKey();
+                ConsoleKeyInfo keyPress = ReadKey();
 
                 switch (keyPress.Key)
                 {
                     case ConsoleKey.Enter:
-                        return resultSB.ToString();
+                        return resultStringBuilder.ToString();
 
                     case ConsoleKey.Backspace:
-                        if (resultSB.Length == 0)
+                        if (string.IsNullOrEmpty(resultStringBuilder.ToString()))
                             break;
-                        resultSB.Remove(resultSB.Length - 1, 1);
-                        SetCursorPosition(x + resultSB.Length, y);
+                        resultStringBuilder.Remove(resultStringBuilder.Length - 1, 1);
+
+                        // Можно заменить на: Write('\b');
+                        SetCursorPosition(_x + resultStringBuilder.Length, _y);
                         Write(' ');
-                        SetCursorPosition(x + resultSB.Length, y);
+                        SetCursorPosition(_x + resultStringBuilder.Length, _y);
                         break;
 
                     default:
-                        resultSB.Append(keyPress.KeyChar);
+                        resultStringBuilder.Append(keyPress.KeyChar);
                         break;
                 }
             }
 
-            return resultSB.ToString();
+            return resultStringBuilder.ToString();
         }
 
-        private static void StringCleaner(string stringToClear)
+        // Метод для стирания строки.
+        // Можно заменить на: Write(new string('\b', stringToClear.Length));
+        private static void ClearString(string stringToClear)
         {
-            SetCursorPosition(x, y);
+            SetCursorPosition(_x, _y);
             Write(new string(' ', stringToClear.Length));
-            SetCursorPosition(x, y);
+            SetCursorPosition(_x, _y);
         }
 
         static void Main(string[] args)
@@ -85,25 +99,29 @@ namespace LaboratoryWork4
             WriteLine($"Введите элементы массива размерностью: {rows} x {columns}");
             ResetColor();
 
+            // Ввод элементов массива.
             for (var i = 0; i < rows; i++)
             {
-                x = 0;
-                y += 2;
-                SetCursorPosition(0, y);
+                // Перемещение курсора через одну строку для формирования строк.
+                _x = 0;
+                _y += 2;
+                SetCursorPosition(0, _y);
 
                 for (var j = 0; j < columns; j++)
                 {
-                    inputArray[i, j] = ForceParse("Ошибка ввода!");
+                    inputArray[i, j] = GetForcedParse("Ошибка ввода!");
 
-                    x += 10;
-                    SetCursorPosition(x, y);
+                    // Перемещение курсора вправо для формирования столбцов.
+                    _x += 10;
+                    SetCursorPosition(_x, _y);
 
+                    //Создание нового массива исходя из условия задачи.
                     if (inputArray[i, j] < 0)
                         outputArray[i] += inputArray[i, j];
                 }
             }
 
-            SetCursorPosition(0, y + 2);
+            SetCursorPosition(0, _y + 2);
 
             ForegroundColor = ConsoleColor.Green;
             WriteLine("Новый массив:\n");
@@ -112,7 +130,7 @@ namespace LaboratoryWork4
                 WriteLine(i);
 
             ResetColor();
-            ReadKey();
+            ReadKey(true);
         }
     }
 }
