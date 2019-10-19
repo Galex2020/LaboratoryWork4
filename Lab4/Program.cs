@@ -115,7 +115,7 @@ namespace LaboratoryWork4
                     _x += 10;
                     SetCursorPosition(_x, _y);
 
-                    //Создание нового массива исходя из условия задачи.
+                    // Создание нового массива исходя из условия задачи.
                     if (inputArray[i, j] < 0)
                         outputArray[i] += inputArray[i, j];
                 }
